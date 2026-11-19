@@ -1,0 +1,52 @@
+{
+  "name": "task_three_websocket_realtime_hub",
+  "version": "1.0.0",
+  "description": "High-Concurrency WebSocket Real-Time Communication Hub with Redis Caching and Persistent File Logging",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "benchmark": "tsx scripts/benchmark.ts"
+  },
+  "keywords": [
+    "websocket",
+    "socket.io",
+    "realtime",
+    "redis",
+    "high-concurrency",
+    "chat",
+    "microservice",
+    "typescript",
+    "express"
+  ],
+  "author": "Mohamed Ahmed",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.5.0",
+    "ioredis-mock": "^8.9.0",
+    "morgan": "^1.10.0",
+    "socket.io": "^4.8.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/ioredis-mock": "^8.2.5",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.13.5",
+    "@types/supertest": "^6.0.2",
+    "socket.io-client": "^4.8.1",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
+  }
+}

@@ -1,0 +1,66 @@
+###
+# TASK 3: Concurrent WebSocket Real-Time Communication Hub
+# REST Microservice HTTP Endpoints Specification
+###
+
+@baseUrl = http://localhost:3000
+
+### 1. System Health & Infrastructure Metrics
+# Inspects uptime, memory consumption, WebSocket connections, Redis status, and persistent file logger status.
+GET {{baseUrl}}/health
+Accept: application/json
+
+###
+
+### 2. List All Active Channels
+# Returns all default and dynamically registered channels with their real-time subscriber counts.
+GET {{baseUrl}}/api/channels
+Accept: application/json
+
+###
+
+### 3. Get Active Members of a Specific Channel
+# Queries Redis sets to return full profiles of all active users inside #tech
+GET {{baseUrl}}/api/channels/tech/users
+Accept: application/json
+
+###
+
+### 4. Get Active Members of General Channel
+GET {{baseUrl}}/api/channels/general/users
+Accept: application/json
+
+###
+
+### 5. List All Active Users Cached in Redis
+# Fetches all online users currently cached inside the Redis memory database.
+GET {{baseUrl}}/api/users/active
+Accept: application/json
+
+###
+
+### 6. Query Persistent Transaction Audit Logs (Latest 50)
+# Reads transaction timestamps and metadata directly from the append-only persistent file store.
+GET {{baseUrl}}/api/logs/transactions?limit=50
+Accept: application/json
+
+###
+
+### 7. Filter Persistent Audit Logs by Event Type
+# Filters transactions for MESSAGE_SENT events
+GET {{baseUrl}}/api/logs/transactions?event=MESSAGE_SENT&limit=25
+Accept: application/json
+
+###
+
+### 8. Filter Persistent Audit Logs by Target Channel
+# Filters transactions for messages sent to #general
+GET {{baseUrl}}/api/logs/transactions?channel=general&limit=20
+Accept: application/json
+
+###
+
+### 9. Persistent File Store Logger Statistics
+# Retrieves metrics on total logged transactions, pending buffer size, and active log file paths.
+GET {{baseUrl}}/api/logs/stats
+Accept: application/json
