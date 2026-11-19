@@ -30,9 +30,11 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+const logDir = process.env.VERCEL ? '/tmp/logs' : parsed.data.LOG_DIR;
+
 export const env = {
   ...parsed.data,
-  LOG_DIR_RESOLVED: path.resolve(process.cwd(), parsed.data.LOG_DIR),
+  LOG_DIR_RESOLVED: path.resolve(process.cwd(), logDir),
 };
 
 export type EnvConfig = typeof env;
