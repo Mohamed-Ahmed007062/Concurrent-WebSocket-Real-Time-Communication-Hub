@@ -16,7 +16,7 @@ export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undef
 
   // Security headers (Allowing inline scripts & styles for the interactive dashboard)
   app.use(
-    helmet({
+    (helmet as any)({
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
