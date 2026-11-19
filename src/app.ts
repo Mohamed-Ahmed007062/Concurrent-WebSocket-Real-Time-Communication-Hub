@@ -69,27 +69,27 @@ export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undef
 
   // Root dashboard and static asset handlers (Serverless compatible)
   app.get('/', (_req: Request, res: Response) => {
-    const indexPath = path.resolve(process.cwd(), 'public/index.html');
     try {
+      const indexPath = path.resolve(process.cwd(), 'public/index.html');
       if (fs.existsSync(indexPath)) {
         const html = fs.readFileSync(indexPath, 'utf8');
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         return res.send(html);
       }
-    } catch (e) {
-      console.warn('Could not read index.html:', e);
+      return res.json({
+        status: 'online',
+        service: 'Concurrent WebSocket Real-Time Communication Hub',
+        endpoints: {
+          health: '/health',
+          channels: '/api/channels',
+          activeUsers: '/api/users/active',
+          auditLogs: '/api/logs/transactions',
+        },
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return res.status(200).send(`<h3>Serverless UI Fallback</h3><p>${msg}</p>`);
     }
-
-    res.json({
-      status: 'online',
-      service: 'Concurrent WebSocket Real-Time Communication Hub',
-      endpoints: {
-        health: '/health',
-        channels: '/api/channels',
-        activeUsers: '/api/users/active',
-        auditLogs: '/api/logs/transactions',
-      },
-    });
   });
 
   app.get('/style.css', (_req: Request, res: Response) => {
