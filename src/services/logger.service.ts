@@ -30,8 +30,12 @@ export class TransactionLoggerService {
   }
 
   private ensureDirectory(): void {
-    if (!fs.existsSync(this.logDir)) {
-      fs.mkdirSync(this.logDir, { recursive: true });
+    try {
+      if (!fs.existsSync(this.logDir)) {
+        fs.mkdirSync(this.logDir, { recursive: true });
+      }
+    } catch (err) {
+      console.warn('Persistent logger directory warning:', err);
     }
   }
 
@@ -67,6 +71,9 @@ export class TransactionLoggerService {
         console.error('Error during scheduled log flush:', err);
       });
     }, env.LOG_FLUSH_INTERVAL_MS);
+    if (this.flushTimer && typeof this.flushTimer.unref === 'function') {
+      this.flushTimer.unref();
+    }
   }
 
   /**

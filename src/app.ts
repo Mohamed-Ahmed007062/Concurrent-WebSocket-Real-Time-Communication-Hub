@@ -50,10 +50,39 @@ export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undef
   // Mount API routers
   app.use(createHealthRouter(getIo));
   app.use('/api', createApiRouter());
+  app.use(createApiRouter());
+
+  app.get('/api', (_req: Request, res: Response) => {
+    res.json({
+      status: 'healthy',
+      message: 'Concurrent WebSocket Real-Time Communication Hub API',
+      endpoints: {
+        health: '/health',
+        channels: '/api/channels',
+        activeUsers: '/api/users/active',
+        auditLogs: '/api/logs/transactions',
+      },
+      timestamp: new Date().toISOString(),
+    });
+  });
 
   // Root redirect / fallback for dashboard
   app.get('/', (_req: Request, res: Response) => {
-    res.sendFile(path.join(publicDir, 'index.html'));
+    const indexPath = path.join(publicDir, 'index.html');
+    try {
+      res.sendFile(indexPath);
+    } catch {
+      res.json({
+        status: 'online',
+        service: 'Concurrent WebSocket Real-Time Communication Hub',
+        endpoints: {
+          health: '/health',
+          channels: '/api/channels',
+          activeUsers: '/api/users/active',
+          auditLogs: '/api/logs/transactions',
+        },
+      });
+    }
   });
 
   // 404 Handler for undefined API routes

@@ -22,7 +22,8 @@ export class RedisService {
 
   private init() {
     const isTest = process.env.NODE_ENV === 'test' || env.NODE_ENV === 'test';
-    if (env.USE_REDIS_MOCK === 'true' || (env.USE_REDIS_MOCK === 'auto' && isTest)) {
+    const isVercelWithoutExternal = !!process.env.VERCEL && (!process.env.REDIS_URL || process.env.REDIS_URL.includes('127.0.0.1'));
+    if (env.USE_REDIS_MOCK === 'true' || (env.USE_REDIS_MOCK === 'auto' && (isTest || isVercelWithoutExternal))) {
       this.client = new (RedisMock as any)();
       this.isMock = true;
       this.isConnected = true;
