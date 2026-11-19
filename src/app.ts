@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createHealthRouter } from './routes/health.routes.js';
 import { createApiRouter } from './routes/api.routes.js';
@@ -69,9 +70,22 @@ export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undef
   // Root redirect / fallback for dashboard
   app.get('/', (_req: Request, res: Response) => {
     const indexPath = path.join(publicDir, 'index.html');
-    try {
-      res.sendFile(indexPath);
-    } catch {
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath, (err) => {
+        if (err && !res.headersSent) {
+          res.json({
+            status: 'online',
+            service: 'Concurrent WebSocket Real-Time Communication Hub',
+            endpoints: {
+              health: '/health',
+              channels: '/api/channels',
+              activeUsers: '/api/users/active',
+              auditLogs: '/api/logs/transactions',
+            },
+          });
+        }
+      });
+    } else {
       res.json({
         status: 'online',
         service: 'Concurrent WebSocket Real-Time Communication Hub',
