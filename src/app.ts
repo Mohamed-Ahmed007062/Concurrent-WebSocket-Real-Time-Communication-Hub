@@ -1,6 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 import fs from 'fs';
@@ -15,22 +14,13 @@ const __dirname = path.dirname(__filename);
 export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undefined)) {
   const app = express();
 
-  // Security headers (Allowing inline scripts & styles for the interactive dashboard)
-  app.use(
-    (helmet as any)({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.socket.io'],
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-          fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-          connectSrc: ["'self'", 'ws:', 'wss:', 'http:', 'https:'],
-          imgSrc: ["'self'", 'data:', 'https:'],
-        },
-      },
-      crossOriginEmbedderPolicy: false,
-    })
-  );
+  // Security headers
+  app.use((_req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+  });
 
   // CORS middleware
   app.use(cors());
