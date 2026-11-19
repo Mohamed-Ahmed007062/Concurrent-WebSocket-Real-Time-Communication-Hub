@@ -19,17 +19,34 @@ function getApp() {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const app = getApp();
+  try {
+    const app = getApp();
 
-  if (!initialized) {
-    try {
-      await redisService.connect();
-      await channelService.initializeDefaultChannels();
-    } catch (e) {
-      console.warn('Vercel initialization warning:', e);
+    if (!initialized) {
+      try {
+        await redisService.connect();
+        await channelService.initializeDefaultChannels();
+      } catch (e) {
+        console.warn('Vercel initialization warning:', e);
+      }
+      initialized = true;
     }
-    initialized = true;
-  }
 
-  return (app as any)(req, res);
+    return (app as any)(req, res);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
+    console.error('Unhandled Vercel serverless error:', err);
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: 'Vercel Serverless Invocation Error',
+        message: msg,
+        url: req.url,
+        stack,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
 }
