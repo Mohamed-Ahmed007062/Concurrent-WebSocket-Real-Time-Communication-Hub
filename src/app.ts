@@ -67,36 +67,51 @@ export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undef
     });
   });
 
-  // Root redirect / fallback for dashboard
+  // Root dashboard and static asset handlers (Serverless compatible)
   app.get('/', (_req: Request, res: Response) => {
-    const indexPath = path.join(publicDir, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath, (err) => {
-        if (err && !res.headersSent) {
-          res.json({
-            status: 'online',
-            service: 'Concurrent WebSocket Real-Time Communication Hub',
-            endpoints: {
-              health: '/health',
-              channels: '/api/channels',
-              activeUsers: '/api/users/active',
-              auditLogs: '/api/logs/transactions',
-            },
-          });
-        }
-      });
-    } else {
-      res.json({
-        status: 'online',
-        service: 'Concurrent WebSocket Real-Time Communication Hub',
-        endpoints: {
-          health: '/health',
-          channels: '/api/channels',
-          activeUsers: '/api/users/active',
-          auditLogs: '/api/logs/transactions',
-        },
-      });
+    const indexPath = path.resolve(process.cwd(), 'public/index.html');
+    try {
+      if (fs.existsSync(indexPath)) {
+        const html = fs.readFileSync(indexPath, 'utf8');
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.send(html);
+      }
+    } catch (e) {
+      console.warn('Could not read index.html:', e);
     }
+
+    res.json({
+      status: 'online',
+      service: 'Concurrent WebSocket Real-Time Communication Hub',
+      endpoints: {
+        health: '/health',
+        channels: '/api/channels',
+        activeUsers: '/api/users/active',
+        auditLogs: '/api/logs/transactions',
+      },
+    });
+  });
+
+  app.get('/style.css', (_req: Request, res: Response) => {
+    const cssPath = path.resolve(process.cwd(), 'public/style.css');
+    try {
+      if (fs.existsSync(cssPath)) {
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        return res.send(fs.readFileSync(cssPath, 'utf8'));
+      }
+    } catch {}
+    res.status(404).send('/* style not found */');
+  });
+
+  app.get('/app.js', (_req: Request, res: Response) => {
+    const jsPath = path.resolve(process.cwd(), 'public/app.js');
+    try {
+      if (fs.existsSync(jsPath)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        return res.send(fs.readFileSync(jsPath, 'utf8'));
+      }
+    } catch {}
+    res.status(404).send('// app script not found');
   });
 
   // 404 Handler for undefined API routes
