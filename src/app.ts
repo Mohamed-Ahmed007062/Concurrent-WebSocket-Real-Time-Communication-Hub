@@ -45,7 +45,7 @@ export function createApp(getIo?: SocketIOServer | (() => SocketIOServer | undef
   app.use(express.urlencoded({ extended: true }));
 
   // Static web dashboard assets
-  const publicDir = path.resolve(__dirname, '../public');
+  const publicDir = path.resolve(process.cwd(), 'public');
   app.use(express.static(publicDir));
 
   // Mount API routers

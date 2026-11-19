@@ -3,7 +3,7 @@
   "buildCommand": "npm run vercel-build",
   "rewrites": [
     {
-      "source": "/(api|health|socket.io)(.*)",
+      "source": "/(.*)",
       "destination": "/api"
     }
   ]
